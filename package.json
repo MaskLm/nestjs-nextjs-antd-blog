@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "concurrently \"yarn workspace frontend start\" \"yarn workspace backend start\"",
+    "start:dev": "concurrently \"yarn workspace frontend dev\" \"yarn workspace backend start:dev\""
+  },
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "name": "nestjs-nextjs-antd-blog",
+  "version": "1.0.0",
+  "license": "MIT"
+}
