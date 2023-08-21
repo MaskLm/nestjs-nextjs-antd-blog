@@ -1,14 +1,8 @@
 'use client';
-import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
+import { Button, Checkbox, Col, Form, Input, message, Row } from 'antd';
 import React, { useEffect } from 'react';
-
-async function onFinish(values: any) {
-  console.log('Success:', values);
-}
-
-function onFinishFailed(errorInfo: any) {
-  console.log('Failed:', errorInfo);
-}
+import { LoginFunc } from './api/login';
+import { router } from 'next/client';
 
 const LoginContainer = () => {
   useEffect(() => {
@@ -22,15 +16,31 @@ const LoginContainer = () => {
       document.body.removeChild(script);
     };
   }, []);
+
+  async function onFinish(values: any) {
+    try {
+      await LoginFunc(values);
+      message.success('Login Success');
+      await router.push('/');
+    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (e.error.statusCode == 401) {
+        message.error('Invalid Username or Password');
+      } else {
+        message.error('Login Failed');
+      }
+    }
+  }
+
   return (
     <>
       <Form
-        name="basic"
+        name="login"
         labelCol={{ span: 4, offset: 2 }}
         wrapperCol={{ span: 16 }}
         initialValues={{ remember: true }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
         <Form.Item

@@ -2,11 +2,9 @@ import axios, { AxiosError } from 'axios';
 
 export const RegFunc = async (userData: any) => {
   try {
-    const response = await axios.post(
-      process.env.NEXT_PUBLIC_API_URL + '/account',
-      { ...userData },
-    );
-    return response;
+    await axios.post(process.env.NEXT_PUBLIC_API_URL + '/account', {
+      ...userData,
+    });
   } catch (e) {
     const axiosError = e as AxiosError;
     if (

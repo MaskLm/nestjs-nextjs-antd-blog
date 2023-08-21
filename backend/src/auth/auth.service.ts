@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { AccountService } from '../account/account.service';
@@ -6,6 +6,9 @@ import * as bcrypt from 'bcrypt';
 import { Account } from '../account/entities/account.entity';
 import { JwtService } from '@nestjs/jwt';
 import { jwtRefreshConstants } from './constants';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { EntityManager } from '@mikro-orm/postgresql';
+import { Auth } from './entities/auth.entity';
 
 type AccountWithoutPassword = Omit<Account, 'password'>;
 
@@ -14,6 +17,7 @@ export class AuthService {
   constructor(
     private accountService: AccountService,
     private jwtService: JwtService,
+    private readonly em: EntityManager,
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -26,7 +30,7 @@ export class AuthService {
         return result;
       } else return null;
     } else {
-      throw new Error('User not found');
+      throw new UnauthorizedException();
     }
   }
 
@@ -51,7 +55,13 @@ export class AuthService {
     });
   }
 
-  async login(account: Account) {
+  async login(loginAuthDto: LoginAuthDto) {
+    const account = await this.accountService.findByUsername(
+      loginAuthDto.username,
+    );
+    if (!account) {
+      throw new UnauthorizedException();
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...accountWithoutPassword } = account;
     const payload = {
@@ -59,15 +69,23 @@ export class AuthService {
       sub: account.id,
       role: account.role,
     };
+    const refreshToken = this.generateRefreshToken(accountWithoutPassword);
+    const createAuthDto: CreateAuthDto = {
+      ...loginAuthDto,
+      refreshToken,
+    };
+    await this.create(createAuthDto, account);
     return {
-      user: payload,
-      access_token: this.generateAccessToken(accountWithoutPassword),
-      refresh_token: this.generateRefreshToken(accountWithoutPassword),
+      account: payload,
+      accessToken: this.generateAccessToken(accountWithoutPassword),
+      refreshToken: refreshToken,
     };
   }
 
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  async create(createAuthDto: CreateAuthDto, account: Account) {
+    const auth: Auth = this.em.create('Auth', createAuthDto);
+    auth.account = account;
+    await this.em.persistAndFlush(auth);
   }
 
   findAll() {
@@ -78,8 +96,8 @@ export class AuthService {
     return `This action returns a #${id} auth`;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async update(accountId: number, updateAuthDto: UpdateAuthDto) {
+    return null;
   }
 
   remove(id: number) {

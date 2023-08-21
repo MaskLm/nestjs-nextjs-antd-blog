@@ -3,12 +3,14 @@ import {
   BeforeUpdate,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryKey,
   Property,
   Unique,
 } from '@mikro-orm/core';
 import * as bcrypt from 'bcrypt';
 import { Auth } from '../../auth/entities/auth.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class Account {
@@ -52,4 +54,7 @@ export class Account {
 
   @OneToMany(() => Auth, (auth) => auth.account, { nullable: true })
   auth: Auth[];
+
+  @OneToOne(() => User, { nullable: true })
+  user: User;
 }

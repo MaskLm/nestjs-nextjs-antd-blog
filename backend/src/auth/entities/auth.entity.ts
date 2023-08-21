@@ -8,15 +8,15 @@ export class Auth {
   @ManyToOne(() => Account)
   account: Account;
   @Property()
-  UserAgent: string;
+  userAgent: string;
   @Property()
   createdAt = new Date();
   @Property({ onUpdate: () => new Date() })
   updatedAt = new Date();
   @Property({ nullable: true })
   deletedAt?: Date;
-  @Property()
-  ip: string;
+  @Property({ nullable: true })
+  ipv4: string;
   @Property()
   refreshToken: string;
 }

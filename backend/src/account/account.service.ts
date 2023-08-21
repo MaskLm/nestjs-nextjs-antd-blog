@@ -42,8 +42,13 @@ export class AccountService {
     }
   }
 
-  update(id: number, updateAccountDto: UpdateAccountDto) {
-    return `This action updates a #${id} account`;
+  async update(id: number, updateAccountDto: UpdateAccountDto) {
+    const account = await this.em.findOne(Account, { id, deletedAt: null });
+    if (account) {
+      const updatedAccount = this.em.assign(account, updateAccountDto);
+      await this.em.persistAndFlush(updatedAccount);
+      return updatedAccount;
+    }
   }
 
   remove(id: number) {

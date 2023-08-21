@@ -1,0 +1,12 @@
+import { Module } from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import storage from './storage';
+
+@Module({
+  controllers: [UserController],
+  providers: [UserService],
+  imports: [MulterModule.register({ storage })],
+})
+export class UserModule {}

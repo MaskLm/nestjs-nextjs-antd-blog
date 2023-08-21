@@ -5,6 +5,34 @@ import React, { useEffect, useState } from 'react';
 import { RegFunc } from './api/reg';
 import { router } from 'next/client';
 
+const PasswordValidation = (rule: any, value: any) => {
+  if (!value) return Promise.reject(new Error('Password is required'));
+
+  if (value.length > 32)
+    return Promise.reject(
+      new Error('Password must be at most 32 characters long'),
+    );
+
+  if (value.length < 8)
+    return Promise.reject(
+      new Error('Password must be at least 8 characters long'),
+    );
+
+  const hasLowerCase = /[a-z]/.test(value);
+  const hasUpperCase = /[A-Z]/.test(value);
+  const hasNumber = /[0-9]/.test(value);
+
+  if (!hasLowerCase || !hasUpperCase || !hasNumber) {
+    return Promise.reject(
+      new Error(
+        'Password must contain at least 1 lowercase letter, 1 uppercase letter, and 1 number',
+      ),
+    );
+  }
+
+  return Promise.resolve();
+};
+
 const RegContainer = () => {
   const [emailOption, setEmailOption] = useState<
     { value: string; label: string }[]
@@ -52,7 +80,7 @@ const RegContainer = () => {
   return (
     <>
       <Form
-        name="basic"
+        name="reg"
         labelCol={{
           xs: { span: 24 },
           sm: { span: 8 },
@@ -107,6 +135,7 @@ const RegContainer = () => {
               max: 32,
               message: 'Password must be at 8 to 32 characters!',
             },
+            { validator: PasswordValidation },
           ]}
         >
           <Input.Password />

@@ -13,6 +13,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LocalAuthGuard } from './guard/local-auth-guard';
 import { Public } from './decorator/public-decorator';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,13 +22,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('login')
-  async login(@Body() body) {
-    return await this.authService.login(body);
-  }
-
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  async login(@Body() loginAuthDto: LoginAuthDto) {
+    return await this.authService.login(loginAuthDto);
   }
 
   @Get()
