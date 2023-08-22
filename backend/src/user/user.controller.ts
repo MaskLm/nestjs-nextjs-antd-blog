@@ -10,16 +10,13 @@ import {
   Patch,
   Post,
   Req,
-  UploadedFile, UseFilters,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import { FileUploadExceptionFilter } from './filter/FileUploadException';
-import { catchError } from 'rxjs';
 
 @Controller('user')
 export class UserController {
