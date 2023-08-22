@@ -9,11 +9,32 @@ import {
   Upload,
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import axiosInstance from '../../tools/AxiosInterceptorsJwt';
+import { router } from 'next/client';
 
 const UploadFunc = async (options: any) => {
   const { onSuccess, onError, file, onProgress } = options;
+  const formData = new FormData();
+  formData.append('avatar', file);
 
-}
+  try {
+    const storedAccount = localStorage.getItem('account');
+    if (storedAccount) {
+      const account = JSON.parse(storedAccount);
+      console.log(account);
+      const response = await axiosInstance.post(
+        process.env.NEXT_PUBLIC_API_URL + `/user/uploadAvatar`,
+        formData,
+      );
+      onSuccess(response.data, file);
+    } else {
+      message.error('Please Login');
+      await router.push('/login');
+    }
+  } catch (error) {
+    onError(error);
+  }
+};
 const UserAddContainer = () => {
   function onFinish(values: any) {
     console.log(values);

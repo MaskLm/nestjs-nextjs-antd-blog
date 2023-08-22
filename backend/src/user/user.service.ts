@@ -25,8 +25,7 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
-  uploadAvatar(avatar: Express.Multer.File) {
-    console.log(avatar);
+  uploadAvatar(avatar: Express.Multer.File, id?: number) {
     return {
       url: `${process.env.BACKEND_URL}/public/avatar/${avatar.filename}`,
     };

@@ -7,16 +7,19 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
-  ParseIntPipe,
   Patch,
   Post,
-  UploadedFile,
+  Req,
+  UploadedFile, UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import { FileUploadExceptionFilter } from './filter/FileUploadException';
+import { catchError } from 'rxjs';
 
 @Controller('user')
 export class UserController {
@@ -62,10 +65,11 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
+  //@UseFilters(new FileUploadExceptionFilter())
   @Post('uploadAvatar')
   @UseInterceptors(FileInterceptor('avatar'))
-  uploadAvatar(
-    @Param('id', ParseIntPipe) id: string,
+  async uploadAvatar(
+    @Req() req: any,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -73,12 +77,12 @@ export class UserController {
             maxSize: 1024 * 1024 * 5,
             message: 'The file must be less than 5MB.',
           }),
-          new FileTypeValidator({ fileType: /\.(jpg|jpeg|png|webp)$/ }),
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
         ],
       }),
     )
     avatar: Express.Multer.File,
   ) {
-    return this.userService.uploadAvatar(avatar);
+    return this.userService.uploadAvatar(avatar, req.user.id);
   }
 }

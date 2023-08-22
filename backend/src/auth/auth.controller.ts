@@ -14,6 +14,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LocalAuthGuard } from './guard/local-auth-guard';
 import { Public } from './decorator/public-decorator';
 import { LoginAuthDto } from './dto/login-auth.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +25,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginAuthDto: LoginAuthDto) {
     return await this.authService.login(loginAuthDto);
+  }
+  @Public()
+  @Post('refresh')
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return await this.authService.refresh(refreshTokenDto);
   }
 
   @Get()

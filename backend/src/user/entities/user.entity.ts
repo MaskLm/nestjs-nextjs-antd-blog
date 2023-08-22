@@ -1,5 +1,6 @@
 import {
-  Entity, OneToMany,
+  Entity,
+  OneToMany,
   OneToOne,
   PrimaryKey,
   Property,
@@ -12,8 +13,6 @@ import { Resource } from './resource.entity';
 
 @Entity()
 export class User {
-  @PrimaryKey()
-  id: number;
   @Property()
   @Unique()
   email: string;
@@ -30,7 +29,7 @@ export class User {
   };
   @OneToMany(() => Blog, (blog) => blog.author)
   blogs = new Array<Blog>();
-  @OneToOne(() => Account)
+  @OneToOne(() => Account, { primary: true })
   account: Account;
   @OneToMany(() => Resource, (resource) => resource.owner)
   resources = new Array<Resource>();

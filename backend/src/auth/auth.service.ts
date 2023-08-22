@@ -9,6 +9,7 @@ import { jwtRefreshConstants } from './constants';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Auth } from './entities/auth.entity';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 type AccountWithoutPassword = Omit<Account, 'password'>;
 
@@ -102,5 +103,28 @@ export class AuthService {
 
   remove(id: number) {
     return `This action removes a #${id} auth`;
+  }
+
+  async findByRefreshToken(refreshToken: string) {
+    const auth = await this.em.findOne('Auth', { refreshToken });
+    if (!auth) throw new UnauthorizedException('Invalid refresh token');
+    return auth;
+  }
+
+  async refresh(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const decodedToken = await this.jwtService.verifyAsync(
+        refreshTokenDto.refreshToken,
+      );
+      const account = await this.accountService.findOne(decodedToken.sub);
+      if (!account) throw new UnauthorizedException('Invalid refresh token');
+      const auth = await this.findByRefreshToken(refreshTokenDto.refreshToken);
+      if (!auth) throw new UnauthorizedException('Invalid refresh token');
+      return {
+        accessToken: await this.generateAccessToken(account),
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

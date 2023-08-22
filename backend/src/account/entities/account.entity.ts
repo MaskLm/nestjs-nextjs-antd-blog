@@ -55,6 +55,6 @@ export class Account {
   @OneToMany(() => Auth, (auth) => auth.account, { nullable: true })
   auth: Auth[];
 
-  @OneToOne(() => User, { nullable: true })
+  @OneToOne(() => User, { nullable: true, owner: true })
   user: User;
 }

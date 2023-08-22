@@ -5,11 +5,8 @@ import { EntityManager } from '@mikro-orm/postgresql';
 
 @Injectable()
 export class BlogService {
+  constructor(private readonly em: EntityManager) {}
 
-  constructor(
-    private readonly em: EntityManager,
-  ) {
-  }
   async create(createBlogDto: CreateBlogDto) {
     return 'This action adds a new blog';
   }
