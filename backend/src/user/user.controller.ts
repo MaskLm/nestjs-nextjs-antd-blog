@@ -23,23 +23,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('avatar'))
-  async create(
-    @Body() createUserDto: CreateUserDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({
-            maxSize: 1024 * 1024 * 5,
-            message: 'The file must be less than 5MB.',
-          }),
-          new FileTypeValidator({ fileType: /\.(jpg|jpeg|png|webp)$/ }),
-        ],
-      }),
-    )
-    avatar: Express.Multer.File,
-  ) {
-    return await this.userService.create(createUserDto, avatar);
+  async create(createUserDto: CreateUserDto) {
+    return await this.userService.create(createUserDto);
   }
 
   @Get()

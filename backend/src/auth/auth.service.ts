@@ -84,9 +84,20 @@ export class AuthService {
   }
 
   async create(createAuthDto: CreateAuthDto, account: Account) {
-    const auth: Auth = this.em.create('Auth', createAuthDto);
-    auth.account = account;
-    await this.em.persistAndFlush(auth);
+    const auth: Auth = await this.em.findOne('Auth', {
+      userAgent: createAuthDto.userAgent,
+      account,
+    });
+    if (auth) {
+      auth.userAgent = createAuthDto.userAgent;
+      auth.refreshToken = createAuthDto.refreshToken;
+      auth.ipv4 = createAuthDto.ipv4;
+      await this.em.persistAndFlush(auth);
+    } else {
+      const authNew: Auth = this.em.create('Auth', createAuthDto);
+      authNew.account = account;
+      await this.em.persistAndFlush(authNew);
+    }
   }
 
   findAll() {

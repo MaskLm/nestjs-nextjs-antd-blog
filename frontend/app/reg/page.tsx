@@ -3,7 +3,7 @@
 import { AutoComplete, Button, Col, Form, Input, message, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RegFunc } from './api/reg';
-import { router } from 'next/client';
+import { useRouter } from 'next/router';
 
 const PasswordValidation = (rule: any, value: any) => {
   if (!value) return Promise.reject(new Error('Password is required'));
@@ -55,6 +55,7 @@ const RegContainer = () => {
     try {
       await RegFunc(rest);
       message.success('Registration successful!');
+      const router = useRouter();
       await router.push('/login');
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

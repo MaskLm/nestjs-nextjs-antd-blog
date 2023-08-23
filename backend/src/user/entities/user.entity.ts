@@ -1,11 +1,4 @@
-import {
-  Entity,
-  OneToMany,
-  OneToOne,
-  PrimaryKey,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Entity, OneToMany, OneToOne, Property, Unique } from '@mikro-orm/core';
 import { Account } from '../../account/entities/account.entity';
 import { PrivateSettings } from './PrivateSettings';
 import { Blog } from '../../blog/entities/blog.entity';
@@ -20,7 +13,7 @@ export class User {
   avatarURL: string;
   @Property()
   nickname: string;
-  @Property()
+  @Property({ nullable: true })
   age: number;
   @Property({ type: 'json' })
   privateSettings: PrivateSettings = {

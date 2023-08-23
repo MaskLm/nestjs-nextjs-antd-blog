@@ -1,33 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { EntityManager } from '@mikro-orm/postgresql';
+import { Resource } from './entities/resource.entity';
+import { User } from './entities/user.entity';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
   constructor(private readonly em: EntityManager) {}
 
-  async create(createUserDto: CreateUserDto, avatar: Express.Multer.File) {}
+  async create(createUserDto: CreateUserDto) {
+    const user: User = this.em.create('User', createUserDto);
+    await this.em.persistAndFlush(user);
+  }
 
   findAll() {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    return await this.em.findOne('User', id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.em.findOne('User', id);
+    if (user) {
+      const updatedUser = this.em.assign(user, updateUserDto);
+      await this.em.persistAndFlush(updatedUser);
+      return updatedUser;
+    }
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
 
-  uploadAvatar(avatar: Express.Multer.File, id?: number) {
-    return {
-      url: `${process.env.BACKEND_URL}/public/avatar/${avatar.filename}`,
-    };
+  async uploadAvatar(avatar: Express.Multer.File, id?: number) {
+    try {
+      const user: User = await this.em.findOne('User', { account: id });
+      const resource: Resource = this.em.create('Resource', {
+        path: avatar.path,
+        owner: user,
+      });
+      await this.em.persistAndFlush(resource);
+      return {
+        url: `${process.env.BACKEND_URL}/${avatar.path}`,
+      };
+    } catch (e) {
+      fs.unlinkSync(avatar.path);
+      throw new HttpException('Error uploading avatar', 500);
+    }
   }
 }
