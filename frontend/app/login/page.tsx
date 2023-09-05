@@ -26,6 +26,8 @@ const LoginContainer = () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (e.error) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         if (e.error.statusCode == 401) {
           message.error('Invalid Username or Password');
         } else {

@@ -52,4 +52,20 @@ export class UserService {
       throw new HttpException('Error uploading avatar', 500);
     }
   }
+
+  async getAvatar(id: number) {
+    const user: User = await this.em.findOne('User', { account: id });
+    return user.avatarURL;
+  }
+
+  async getAuthor(id: number) {
+    const user = await this.em.findOne(
+      User,
+      { account: id },
+      {
+        fields: ['email', 'avatarURL', 'nickname'],
+      },
+    );
+    return user;
+  }
 }

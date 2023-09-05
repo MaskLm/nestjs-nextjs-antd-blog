@@ -9,6 +9,10 @@ export class Blog {
   content: string;
   @Property()
   title: string;
+  @Property()
+  createdAt: Date = new Date();
+  @Property({ onUpdate: () => new Date() })
+  updatedAt: Date = new Date();
   @ManyToOne(() => User)
   author: User;
 }

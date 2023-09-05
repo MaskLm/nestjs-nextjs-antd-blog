@@ -8,11 +8,13 @@ import './layout.css';
 import { UserOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import axiosInstance from './tools/AxiosInterceptorsJwt';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
+
 async function getAvatarURL(account: any) {
   const response = await axiosInstance.get(
     process.env.NEXT_PUBLIC_API_URL + '/user/' + account.sub,
@@ -21,6 +23,7 @@ async function getAvatarURL(account: any) {
 }
 
 function RootLayout({ children }: RootLayoutProps) {
+  const searchParams = useSearchParams();
   const [avatarURL, setAvatarURL] = React.useState('');
   const [account, setAccount] = React.useState(null);
   const router = useRouter();
@@ -34,9 +37,11 @@ function RootLayout({ children }: RootLayoutProps) {
       });
     }
   }, []);
+
   function onClick({ item, key, keyPath, domEvent }: any) {
     if (key === 'home') router.push('/');
   }
+
   const items = [{ label: 'Home', key: 'home' }];
   return (
     <html lang="en">

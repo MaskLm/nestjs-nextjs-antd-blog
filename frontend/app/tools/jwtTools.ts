@@ -1,3 +1,4 @@
+'use client';
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 import { router } from 'next/client';

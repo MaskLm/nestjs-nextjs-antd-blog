@@ -1,3 +1,4 @@
+'use client';
 import axios, { AxiosError } from 'axios';
 
 export const RegFunc = async (userData: any) => {

@@ -1,3 +1,4 @@
+'use client';
 import axios, { AxiosError } from 'axios';
 
 export async function LoginFunc(userData: any) {

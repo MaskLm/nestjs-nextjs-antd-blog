@@ -1,8 +1,14 @@
 'use client';
+import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 
-import React from 'react';
-import 'antd/dist/antd.css';
+const BlogList = dynamic(() => import('./BlogList'), {
+  ssr: false,
+});
 
-const HomePage: React.FC = () => <h1>Hello, Home page!</h1>;
+const HomePage = () => {
+  const searchParams = useSearchParams();
+  return <BlogList />;
+};
 
 export default HomePage;

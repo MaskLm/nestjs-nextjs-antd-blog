@@ -42,7 +42,7 @@ const UploadFunc = async (options: any) => {
   }
 };
 const UserAddContainer = () => {
-  const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState<any[]>([]);
 
   function onFinish(values: any) {
     const accountString = localStorage.getItem('account');
