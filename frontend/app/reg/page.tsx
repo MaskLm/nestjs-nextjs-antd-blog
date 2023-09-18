@@ -4,34 +4,7 @@ import { AutoComplete, Button, Col, Form, Input, message, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RegFunc } from './api/reg';
 import { useRouter } from 'next/router';
-
-const PasswordValidation = (rule: any, value: any) => {
-  if (!value) return Promise.reject(new Error('Password is required'));
-
-  if (value.length > 32)
-    return Promise.reject(
-      new Error('Password must be at most 32 characters long'),
-    );
-
-  if (value.length < 8)
-    return Promise.reject(
-      new Error('Password must be at least 8 characters long'),
-    );
-
-  const hasLowerCase = /[a-z]/.test(value);
-  const hasUpperCase = /[A-Z]/.test(value);
-  const hasNumber = /[0-9]/.test(value);
-
-  if (!hasLowerCase || !hasUpperCase || !hasNumber) {
-    return Promise.reject(
-      new Error(
-        'Password must contain at least 1 lowercase letter, 1 uppercase letter, and 1 number',
-      ),
-    );
-  }
-
-  return Promise.resolve();
-};
+import PasswordValidation from '../tools/account/PasswordValidation';
 
 const RegContainer = () => {
   const [emailOption, setEmailOption] = useState<
@@ -55,8 +28,13 @@ const RegContainer = () => {
     try {
       await RegFunc(rest);
       message.success('Registration successful!');
-      const router = useRouter();
-      await router.push('/login');
+      useEffect(() => {
+        const clear = async () => {
+          const router = useRouter();
+          await router.push('/login');
+        };
+        clear();
+      }, []);
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

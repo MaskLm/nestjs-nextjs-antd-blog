@@ -15,7 +15,7 @@ import axiosInstance from '../../tools/AxiosInterceptorsJwt';
 import { useState } from 'react';
 import ImgCrop from 'antd-img-crop';
 import { RcFile } from 'antd/es/upload';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const UploadFunc = async (options: any) => {
   const { onSuccess, onError, file, onProgress } = options;
@@ -25,8 +25,6 @@ const UploadFunc = async (options: any) => {
   try {
     const storedAccount = localStorage.getItem('account');
     if (storedAccount) {
-      const account = JSON.parse(storedAccount);
-      console.log(account);
       const response = await axiosInstance.post(
         process.env.NEXT_PUBLIC_API_URL + `/user/uploadAvatar`,
         formData,
@@ -35,15 +33,15 @@ const UploadFunc = async (options: any) => {
     } else {
       message.error('Please Login');
       const router = useRouter();
-      await router.push('/login');
+      router.push('/login');
     }
   } catch (error) {
     onError(error);
   }
 };
-const UserAddContainer = () => {
+const UserEditContainer = () => {
   const [fileList, setFileList] = useState<any[]>([]);
-
+  const [defaultValue, setDefaultValue] = useState<any>({});
   function onFinish(values: any) {
     const accountString = localStorage.getItem('account');
     if (accountString) {
@@ -96,6 +94,7 @@ const UserAddContainer = () => {
       labelCol={{ span: 4, offset: 2 }}
       wrapperCol={{ span: 16 }}
       onFinish={onFinish}
+      defaultValue={defaultValue}
     >
       <Form.Item label={'Nickname'} name={'nickname'}>
         <Input />
@@ -149,4 +148,4 @@ const UserAddContainer = () => {
     </Form>
   );
 };
-export default UserAddContainer;
+export default UserEditContainer;

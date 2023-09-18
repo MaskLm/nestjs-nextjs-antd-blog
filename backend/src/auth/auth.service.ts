@@ -1,15 +1,20 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { AccountService } from '../account/account.service';
 import * as bcrypt from 'bcrypt';
 import { Account } from '../account/entities/account.entity';
 import { JwtService } from '@nestjs/jwt';
-import { jwtRefreshConstants } from './constants';
+import {
+  jwtAccountInfoProtectConstants,
+  jwtRefreshConstants,
+} from './constants';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Auth } from './entities/auth.entity';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import otpGenerator from 'otp-generator';
+import { Redis } from 'ioredis';
 
 type AccountWithoutPassword = Omit<Account, 'password'>;
 
@@ -19,6 +24,7 @@ export class AuthService {
     private accountService: AccountService,
     private jwtService: JwtService,
     private readonly em: EntityManager,
+    @Inject('REDIS') private readonly redis: Redis,
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -136,6 +142,52 @@ export class AuthService {
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+
+  async generateUpdateAccountToken(account: AccountWithoutPassword) {
+    const payload = {
+      username: account.username,
+      sub: account.id,
+      role: account.role,
+    };
+    const token = this.jwtService.sign(payload, {
+      secret: jwtAccountInfoProtectConstants.secret,
+      expiresIn: jwtAccountInfoProtectConstants.expiresIn,
+    });
+    this.redis.set(
+      `auth:updateAccountToken:${account.id}`,
+      token,
+      'EX',
+      60 * 60,
+    );
+  }
+
+  async getUpdateAccountTokenByOldPassword(id: number, oldPassword: string) {
+    const existUser = await this.accountService.findOne(id);
+    const isMatch = await bcrypt.compare(oldPassword, existUser.password);
+    if (isMatch) {
+      return await this.generateUpdateAccountToken(existUser);
+    } else {
+      throw new UnauthorizedException('Invalid old password');
+    }
+  }
+
+  async generateOTPForUpdateAccount(id: number) {
+    const otp = otpGenerator.generate(6, {
+      specialChars: false,
+    });
+    this.redis.set(`auth:updateAccountOTP:${id}`, otp, 'EX', 60 * 5);
+  }
+
+  async getUpdateAccountTokenByOTP(id: number, otp: string) {
+    const existOTP = await this.redis.get(`auth:updateAccountOTP:${id}`);
+    if (existOTP === otp) {
+      return await this.generateUpdateAccountToken(
+        await this.accountService.findOne(id),
+      );
+    } else {
+      throw new UnauthorizedException('Invalid OTP');
     }
   }
 }

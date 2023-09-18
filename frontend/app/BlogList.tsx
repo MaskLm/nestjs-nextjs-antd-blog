@@ -1,11 +1,12 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import { PaginationConfig } from 'antd/es/pagination';
 import axios from 'axios';
 import { Avatar, List } from 'antd';
 
 const BlogList = () => {
-  const [data, setData] = useState([] as any);
+  const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [listParams, setListParams] = useState<ListParams>({
     pagination: {

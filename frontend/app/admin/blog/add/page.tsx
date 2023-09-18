@@ -1,10 +1,12 @@
 'use client';
 
+import 'client-only';
+
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import { Button, Form, Input, message } from 'antd';
 import React from 'react';
-import AxiosInterceptorsJwt from '../../tools/AxiosInterceptorsJwt';
+import AxiosInterceptorsJwt from '../../../tools/AxiosInterceptorsJwt';
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/router';
 

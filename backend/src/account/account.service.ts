@@ -1,15 +1,22 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Account } from './entities/account.entity';
 import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AccountService {
   constructor(
     private readonly em: EntityManager,
     private readonly userService: UserService,
+    private jwtService: JwtService,
   ) {}
 
   async create(createAccountDto: CreateAccountDto) {
@@ -51,13 +58,34 @@ export class AccountService {
     }
   }
 
-  async update(id: number, updateAccountDto: UpdateAccountDto) {
-    const account = await this.em.findOne(Account, { id, deletedAt: null });
-    if (account) {
-      const updatedAccount = this.em.assign(account, updateAccountDto);
-      await this.em.persistAndFlush(updatedAccount);
-      return updatedAccount;
+  async decodeToken(token: string) {
+    try {
+      return await this.jwtService.verifyAsync(token);
+    } catch (e) {
+      throw new UnauthorizedException('Invalid refresh token');
     }
+  }
+
+  async update(id: number, updateAccountDto: UpdateAccountDto) {
+    if ('username' in updateAccountDto) {
+      throw new BadRequestException('Username cannot be changed.');
+    }
+    if ('updateAccountJwt' in updateAccountDto) {
+      const decodedJwt = await this.decodeToken(
+        updateAccountDto.updateAccountJwt,
+      );
+      if (!decodedJwt) throw new UnauthorizedException();
+      else {
+        const id = decodedJwt.sub;
+        const account = await this.em.findOne(Account, { id, deletedAt: null });
+        if (account) {
+          const updatedAccount = this.em.assign(account, updateAccountDto);
+          await this.em.persistAndFlush(updatedAccount);
+          return updatedAccount;
+        }
+      }
+    }
+    throw new UnauthorizedException();
   }
 
   remove(id: number) {

@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next -p 4000",
-    "start:dev": "nodemon --watch app --exec 'yarn build-and-start'",
+    "start:dev": "nodemon --watch app --ext ts,tsx,js,mjs,cjs,json,env --exec 'yarn build-and-start'",
     "build": "next build",
     "start": "next start -p 4000",
     "build-and-start": "next build && next start -p 4000"
@@ -12,19 +12,22 @@
     "antd": "^4.0.0",
     "antd-img-crop": "^4.12.2",
     "axios": "^1.4.0",
+    "client-only": "^0.0.1",
     "easymde": "^2.18.0",
     "jwt-decode": "^3.1.2",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
-    "react-simplemde-editor": "^5.2.0"
+    "react-simplemde-editor": "^5.2.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.4.5",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
     "@types/simplemde": "^1.11.8",
+    "eslint": "^8.48.0",
     "eslint-config-prettier": "^9.0.0",
     "nodemon": "^3.0.1",
     "typescript": "^5.1.6"
@@ -35,5 +38,6 @@
   },
   "name": "frontend",
   "version": "1.0.0",
-  "license": "MIT"
+  "license": "MIT",
+  "main": "index.js"
 }

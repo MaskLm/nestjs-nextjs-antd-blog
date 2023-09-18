@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException('You are not authenticated');
     }
 
-    const hasRole = user.role.some(r => roles.includes(r));
+    const hasRole = user.role.some((r) => roles.includes(r));
     if (!hasRole) {
       console.log(hasRole);
       throw new UnauthorizedException('You do not have permissions');
