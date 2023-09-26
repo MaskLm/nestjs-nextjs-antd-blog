@@ -13,12 +13,12 @@ const ChangePasswordForm = () => {
     if (accountId == -1) router.push('/login');
   }, []);
 
-  function get
+  /*  function getChangeAccountToken() {}
 
-  function ChangePasswordFunc() {
-
+  function ChangePasswordFunc() {}*/
+  function onFinish(values: any) {
+    console.log(values);
   }
-  function onFinish(values: any) {}
 
   return (
     <Form

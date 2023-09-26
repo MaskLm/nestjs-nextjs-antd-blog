@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { PaginationConfig } from 'antd/es/pagination';
 import axios from 'axios';
 import { Avatar, List } from 'antd';
+import Link from 'next/link';
 
 const BlogList = () => {
   const [data, setData] = useState();
@@ -75,9 +76,9 @@ const BlogList = () => {
           <List.Item.Meta
             avatar={<Avatar src={item.author.avatarURL} />}
             title={
-              <a href={process.env.NEXT_PUBLIC_WEB_URL + '/blog/' + item.id}>
+              <Link href={process.env.NEXT_PUBLIC_WEB_URL + '/blog/' + item.id}>
                 {item.title}
-              </a>
+              </Link>
             }
             description={item.description}
           />

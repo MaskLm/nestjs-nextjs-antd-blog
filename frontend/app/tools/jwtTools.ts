@@ -1,12 +1,12 @@
 'use client';
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
-import { router } from 'next/client';
+import { useRouter } from 'next/navigation';
 import { message } from 'antd';
 
-export function checkIfTokenExpired(accessToken: string) {
+export async function checkIfTokenExpired(accessToken: string) {
   try {
-    const decoded = jwtDecode(accessToken);
+    const decoded = await jwtDecode(accessToken);
     const currentTime = Date.now() / 1000;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -20,7 +20,7 @@ export function checkIfTokenExpired(accessToken: string) {
 
 export async function refreshAccessToken(refreshToken: string) {
   try {
-    const decoded = jwtDecode(refreshToken);
+    const decoded = await jwtDecode(refreshToken);
     const currentTime = Date.now() / 1000;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -30,7 +30,8 @@ export async function refreshAccessToken(refreshToken: string) {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('account');
       //跳转到登录页面
-      await router.push('/login');
+      const router = useRouter();
+      router.push('/login');
     }
     const response = await axios.post(
       process.env.NEXT_PUBLIC_API_URL + '/auth/refresh',

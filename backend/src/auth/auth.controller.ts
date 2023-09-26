@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -30,6 +31,15 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return await this.authService.refresh(refreshTokenDto);
+  }
+
+  @Public()
+  @Get('getUpdateAccountTokenByOTP')
+  async getUpdateAccountTokenByOTP(
+    @Query('email') email: string,
+    @Query('otp') otp: string,
+  ) {
+    return await this.authService.getUpdateAccountTokenByOTP(email, otp);
   }
 
   @Get()

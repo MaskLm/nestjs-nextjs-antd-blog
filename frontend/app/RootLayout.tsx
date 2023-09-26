@@ -53,66 +53,62 @@ function RootLayout({ children }: RootLayoutProps) {
   }
 
   return (
-    <html lang="en">
-      <body>
-        <Layout className="layout">
-          <Header>
-            <Row>
-              <Col>
-                <div className="logo" />
-              </Col>
-              <Col flex={'auto'}>
-                <Menu
-                  theme={'dark'}
-                  mode="horizontal"
-                  items={items}
-                  onClick={onClick}
-                />
-              </Col>
-              <Col
-                flex="auto"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <div
-                  style={{
-                    float: 'right',
-                  }}
-                >
-                  {account ? (
-                    avatarURL ? (
-                      <Link href={'/user/edit'}>
-                        {' '}
-                        <Avatar
-                          icon={<Image src={avatarURL} preview={false} />}
-                        />{' '}
-                      </Link>
-                    ) : (
-                      <Link href={'/user/edit'}>
-                        <Avatar icon={<UserOutlined />} />{' '}
-                      </Link>
-                    )
-                  ) : (
-                    <Link href={'/login'}>Login</Link>
-                  )}
-                </div>
-              </Col>
-            </Row>
-          </Header>
-          <Content style={{ padding: '0 50px' }}>
-            <div className="site-layout-content" style={{ marginTop: '50px' }}>
-              {children}
+    <Layout className="layout">
+      <Header>
+        <Row>
+          <Col>
+            <div className="logo" />
+          </Col>
+          <Col flex={'auto'}>
+            <Menu
+              theme={'dark'}
+              mode="horizontal"
+              items={items}
+              onClick={onClick}
+            />
+          </Col>
+          <Col
+            flex="auto"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <div
+              style={{
+                float: 'right',
+              }}
+            >
+              {account ? (
+                avatarURL ? (
+                  <Link href={'/user/edit'}>
+                    {' '}
+                    <Avatar
+                      icon={<Image src={avatarURL} preview={false} />}
+                    />{' '}
+                  </Link>
+                ) : (
+                  <Link href={'/user/edit'}>
+                    <Avatar icon={<UserOutlined />} />{' '}
+                  </Link>
+                )
+              ) : (
+                <Link href={'/login'}>Login</Link>
+              )}
             </div>
-          </Content>
-          <Footer style={{ textAlign: 'center' }}>
-            Ant Design ©2018 Created by Ant UED
-          </Footer>
-        </Layout>
-      </body>
-    </html>
+          </Col>
+        </Row>
+      </Header>
+      <Content style={{ padding: '0 50px' }}>
+        <div className="site-layout-content" style={{ marginTop: '50px' }}>
+          {children}
+        </div>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}>
+        Ant Design ©2018 Created by Ant UED
+      </Footer>
+    </Layout>
   );
 }
 

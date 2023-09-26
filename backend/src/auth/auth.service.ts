@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Account } from '../account/entities/account.entity';
 import { JwtService } from '@nestjs/jwt';
 import {
+  jwtAccessConstants,
   jwtAccountInfoProtectConstants,
   jwtRefreshConstants,
 } from './constants';
@@ -13,7 +14,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Auth } from './entities/auth.entity';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import otpGenerator from 'otp-generator';
+import { generate } from 'otp-generator';
 import { Redis } from 'ioredis';
 
 type AccountWithoutPassword = Omit<Account, 'password'>;
@@ -28,7 +29,9 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    const existUser = await this.accountService.findByUsername(username);
+    const existUser = await this.accountService.findByUsernameWithPassword(
+      username,
+    );
     if (existUser) {
       const isMatch = await bcrypt.compare(password, existUser.password);
       if (isMatch) {
@@ -47,7 +50,10 @@ export class AuthService {
       sub: account.id,
       role: account.role,
     };
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, {
+      secret: jwtAccessConstants.secret,
+      expiresIn: jwtAccessConstants.expiresIn,
+    });
   }
 
   generateRefreshToken(account: AccountWithoutPassword) {
@@ -63,7 +69,7 @@ export class AuthService {
   }
 
   async login(loginAuthDto: LoginAuthDto) {
-    const account = await this.accountService.findByUsername(
+    const account = await this.accountService.findByUsernameWithPassword(
       loginAuthDto.username,
     );
     if (!account) {
@@ -138,7 +144,7 @@ export class AuthService {
       const auth = await this.findByRefreshToken(refreshTokenDto.refreshToken);
       if (!auth) throw new UnauthorizedException('Invalid refresh token');
       return {
-        accessToken: await this.generateAccessToken(account),
+        accessToken: this.generateAccessToken(account),
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
@@ -159,8 +165,9 @@ export class AuthService {
       `auth:updateAccountToken:${account.id}`,
       token,
       'EX',
-      60 * 60,
+      60 * 5,
     );
+    return { id: account.id, token };
   }
 
   async getUpdateAccountTokenByOldPassword(id: number, oldPassword: string) {
@@ -174,20 +181,20 @@ export class AuthService {
   }
 
   async generateOTPForUpdateAccount(id: number) {
-    const otp = otpGenerator.generate(6, {
-      specialChars: false,
-    });
+    const otp = generate(6, { upperCaseAlphabets: false, specialChars: false });
     this.redis.set(`auth:updateAccountOTP:${id}`, otp, 'EX', 60 * 5);
+    return otp;
   }
 
-  async getUpdateAccountTokenByOTP(id: number, otp: string) {
-    const existOTP = await this.redis.get(`auth:updateAccountOTP:${id}`);
+  async getUpdateAccountTokenByOTP(email: string, otp: string) {
+    const account = await this.accountService.findByEmail(email);
+    const existOTP = await this.redis.get(
+      `auth:updateAccountOTP:${account.id}`,
+    );
+    if (!existOTP) throw new UnauthorizedException('OTP is expired or error');
     if (existOTP === otp) {
-      return await this.generateUpdateAccountToken(
-        await this.accountService.findOne(id),
-      );
-    } else {
-      throw new UnauthorizedException('Invalid OTP');
+      await this.redis.del(`auth:updateAccountOTP:${account.id}`);
+      return await this.generateUpdateAccountToken(account);
     }
   }
 }

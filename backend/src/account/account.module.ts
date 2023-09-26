@@ -6,8 +6,8 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [AccountController],
-  providers: [AccountService, JwtService],
-  imports: [UserModule, JwtModule],
+  providers: [AccountService],
+  imports: [UserModule],
   exports: [AccountService],
 })
 export class AccountModule {}

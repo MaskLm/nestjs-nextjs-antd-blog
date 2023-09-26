@@ -2,7 +2,7 @@
 import { Button, Checkbox, Col, Form, Input, message, Row } from 'antd';
 import React, { useEffect } from 'react';
 import { LoginFunc } from './api/login';
-import { router } from 'next/client';
+import { useRouter } from 'next/navigation';
 
 const LoginContainer = () => {
   useEffect(() => {
@@ -21,7 +21,8 @@ const LoginContainer = () => {
     try {
       await LoginFunc(values);
       message.success('Login Success');
-      await router.push('/');
+      const router = useRouter();
+      router.push('/');
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

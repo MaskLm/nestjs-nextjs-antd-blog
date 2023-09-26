@@ -4,17 +4,18 @@ import { UpdateMailDto } from './dto/update-mail.dto';
 import { Account } from '../account/entities/account.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { AuthService } from '../auth/auth.service';
-
-type AccountWithoutPassword = Omit<Account, 'password'>;
+import { AccountService } from '../account/account.service';
 
 @Injectable()
 export class MailService {
   constructor(
     private readonly mailerService: MailerService,
     private readonly authService: AuthService,
+    private readonly accountService: AccountService,
   ) {}
 
-  async sendAccountConfirmation(account: AccountWithoutPassword) {
+  async sendAccountConfirmation(id: number) {
+    const account: Account = await this.accountService.findOne(id);
     await this.mailerService.sendMail({
       to: account.email,
       subject: 'Welcome to Nice App! Confirm Your Email',
@@ -27,15 +28,16 @@ export class MailService {
     });
   }
 
-  async sendResetPassword(account: AccountWithoutPassword) {
+  async sendResetPassword(email: string) {
+    const account: Account = await this.accountService.findByEmail(email);
     await this.mailerService.sendMail({
       to: account.email,
       subject: 'Reset Password',
-      template: './template/resetPassword', // 指向模板文件
+      template: 'src/mail/template/resetPassword', // 指向模板文件
       context: {
         // 模板变量
         name: account.username,
-        code: this.authService.generateOTPForUpdateAccount(account.id),
+        code: await this.authService.generateOTPForUpdateAccount(account.id),
       },
     });
   }

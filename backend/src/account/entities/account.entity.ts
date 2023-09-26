@@ -48,6 +48,10 @@ export class Account {
 
   @BeforeUpdate()
   private async hashPasswordBeforeUpdate() {
+    function isBcryptHash(str) {
+      return /^\$2[ayb]\$.{56}$/.test(str);
+    }
+    if (isBcryptHash(this.password)) return;
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, salt);
   }

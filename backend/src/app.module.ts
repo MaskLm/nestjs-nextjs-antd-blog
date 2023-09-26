@@ -10,6 +10,7 @@ import { BlogModule } from './blog/blog.module';
 import { UserModule } from './user/user.module';
 import { MailModule } from './mail/mail.module';
 import { RedisModule } from './RedisModule';
+import { Oauth2Module } from './oauth2/oauth2.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RedisModule } from './RedisModule';
     UserModule,
     MailModule,
     RedisModule,
+    Oauth2Module,
   ],
   controllers: [AppController],
   providers: [

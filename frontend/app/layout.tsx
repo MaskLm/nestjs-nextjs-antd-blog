@@ -10,7 +10,13 @@ interface RootLayoutProps {
 }
 
 function Layout({ children }: RootLayoutProps) {
-  return <RootLayout>{children}</RootLayout>;
+  return (
+    <html lang="en">
+      <body>
+        <RootLayout>{children}</RootLayout>;
+      </body>
+    </html>
+  );
 }
 
 export default Layout;
