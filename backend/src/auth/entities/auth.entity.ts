@@ -1,7 +1,14 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { Account } from '../../account/entities/account.entity';
 
 @Entity()
+@Index({ properties: ['refreshToken'] })
 export class Auth {
   @PrimaryKey()
   id: number;

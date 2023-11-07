@@ -2,12 +2,9 @@
 import { message, Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import Comments from './comments';
 
-const BlogImage = (props: any) => {
-  return <img {...props} style={{ maxWidth: '100%' }} />;
-};
-
-const BlogContainer = ({ params }: { params: { slug: string } }) => {
+const BlogContainer = ({ params }: { params: { slug: number } }) => {
   const [data, setData] = useState({
     title: '',
     content: '',
@@ -59,6 +56,9 @@ const BlogContainer = ({ params }: { params: { slug: string } }) => {
           ) : (
             'Loading...'
           )}
+        </div>
+        <div>
+          <Comments topicId={params.slug} />
         </div>
       </Spin>
     </div>

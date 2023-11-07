@@ -7,12 +7,14 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Oauth2Service } from './oauth2.service';
 import { CreateOauth2Dto } from './dto/create-oauth2.dto';
 import { UpdateOauth2Dto } from './dto/update-oauth2.dto';
 import { Public } from '../auth/decorator/public-decorator';
+import { Response } from 'express';
 
 @Controller('oauth2')
 export class Oauth2Controller {
@@ -26,9 +28,18 @@ export class Oauth2Controller {
 
   @Public()
   @Get('google/callback')
-  googleCallback(@Query('error') error?: string, @Query('code') code?: string) {
+  async googleCallback(
+    @Res() res: Response,
+    @Query('error') error?: string,
+    @Query('code') code?: string,
+  ) {
     if (error) throw new UnauthorizedException(error);
-    if (code) return this.oauth2Service.googleCallback(code);
+    if (code) {
+      const ans = await this.oauth2Service.googleCallback(code);
+      return res.redirect(
+        process.env.FRONTEND_URL + '/oauth2/google/callback?token=' + ans,
+      );
+    }
   }
 
   @Post()
@@ -44,11 +55,6 @@ export class Oauth2Controller {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.oauth2Service.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOauth2Dto: UpdateOauth2Dto) {
-    return this.oauth2Service.update(+id, updateOauth2Dto);
   }
 
   @Delete(':id')

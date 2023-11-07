@@ -16,6 +16,7 @@ import { Auth } from './entities/auth.entity';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { generate } from 'otp-generator';
 import { Redis } from 'ioredis';
+import { Oauth2LoginDto } from './dto/oauth2-auth.dto';
 
 type AccountWithoutPassword = Omit<Account, 'password'>;
 
@@ -68,8 +69,10 @@ export class AuthService {
     });
   }
 
+  //async oauth2Login(oauth2LoginDto: Oauth2LoginDto) {}
+
   async login(loginAuthDto: LoginAuthDto) {
-    const account = await this.accountService.findByUsernameWithPassword(
+    const account = await this.accountService.findByUsername(
       loginAuthDto.username,
     );
     if (!account) {
@@ -87,7 +90,7 @@ export class AuthService {
       ...loginAuthDto,
       refreshToken,
     };
-    await this.create(createAuthDto, account);
+    await this.create(createAuthDto, account.id);
     return {
       account: payload,
       accessToken: this.generateAccessToken(accountWithoutPassword),
@@ -95,7 +98,8 @@ export class AuthService {
     };
   }
 
-  async create(createAuthDto: CreateAuthDto, account: Account) {
+  async create(createAuthDto: CreateAuthDto, accountId: number) {
+    const account: Account = await this.accountService.findOne(accountId);
     const auth: Auth = await this.em.findOne('Auth', {
       userAgent: createAuthDto.userAgent,
       account,
@@ -138,6 +142,9 @@ export class AuthService {
     try {
       const decodedToken = await this.jwtService.verifyAsync(
         refreshTokenDto.refreshToken,
+        {
+          secret: jwtRefreshConstants.secret,
+        },
       );
       const account = await this.accountService.findOne(decodedToken.sub);
       if (!account) throw new UnauthorizedException('Invalid refresh token');

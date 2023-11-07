@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect } from 'react';
-import axiosInstance from './tools/AxiosInterceptorsJwt';
 import { Avatar, Col, Image, Layout, Menu, Row } from 'antd';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
 import Link from 'next/link';
@@ -8,16 +7,10 @@ import 'antd/dist/antd.css';
 import './layout.css';
 import { UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import getAvatarURL from './tools/account/getAvatar';
 
 interface RootLayoutProps {
   children: React.ReactNode;
-}
-
-async function getAvatarURL(account: any) {
-  const response = await axiosInstance.get(
-    process.env.NEXT_PUBLIC_API_URL + '/user/' + account.sub,
-  );
-  return response.data.avatarURL;
 }
 
 function RootLayout({ children }: RootLayoutProps) {

@@ -2,17 +2,22 @@ import {
   BeforeCreate,
   BeforeUpdate,
   Entity,
+  Index,
   OneToMany,
   OneToOne,
   PrimaryKey,
   Property,
+  SerializedPrimaryKey,
   Unique,
 } from '@mikro-orm/core';
 import * as bcrypt from 'bcrypt';
 import { Auth } from '../../auth/entities/auth.entity';
 import { User } from '../../user/entities/user.entity';
+import { Oauth2 } from '../../oauth2/entities/oauth2.entity';
 
 @Entity()
+@Index({ properties: ['username'] })
+@Index({ properties: ['email'] })
 export class Account {
   @PrimaryKey()
   id!: number;
@@ -21,7 +26,7 @@ export class Account {
   @Property()
   username: string;
 
-  @Property()
+  @Property({ hidden: true })
   password: string;
 
   @Property()
@@ -61,4 +66,7 @@ export class Account {
 
   @OneToOne(() => User, { nullable: true, owner: true })
   user: User;
+
+  @OneToMany(() => Oauth2, (oauth2) => oauth2.account, { nullable: true })
+  oauth2: Oauth2[];
 }

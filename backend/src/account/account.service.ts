@@ -42,7 +42,6 @@ export class AccountService {
     try {
       const account = await this.em.findOneOrFail(Account, { username });
       if (account) {
-        delete account.password;
         return account;
       }
       return null;
@@ -56,6 +55,7 @@ export class AccountService {
   async findByUsernameWithPassword(username: string) {
     try {
       const account = await this.em.findOneOrFail(Account, { username });
+      await this.em.populate(account, ['password']);
       if (account) {
         return account;
       }
@@ -71,7 +71,6 @@ export class AccountService {
     try {
       const account = await this.em.findOneOrFail(Account, { email });
       if (account) {
-        delete account.password;
         return account;
       }
       return null;
@@ -92,7 +91,6 @@ export class AccountService {
       deletedAt: null,
     });
     if (account) {
-      delete account.password;
       return account;
     } else {
       throw new Error('Account not found');
