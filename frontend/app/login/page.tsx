@@ -1,10 +1,13 @@
 'use client';
 import { Button, Checkbox, Col, Form, Input, message, Row } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { LoginFunc } from './api/login';
 import { useRouter } from 'next/navigation';
+import contextAccountStore from '../accountStore';
 
 const LoginContainer = () => {
+  const router = useRouter();
+  const accountStore = useContext(contextAccountStore);
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
@@ -19,10 +22,12 @@ const LoginContainer = () => {
 
   async function onFinish(values: any) {
     try {
-      await LoginFunc(values);
+      const account = await LoginFunc(values);
+      accountStore.setAccount(account);
       message.success('Login Success');
-      const router = useRouter();
-      router.push('/');
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

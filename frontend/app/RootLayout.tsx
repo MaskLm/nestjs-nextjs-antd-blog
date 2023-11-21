@@ -8,27 +8,28 @@ import './layout.css';
 import { UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import getAvatarURL from './tools/account/getAvatar';
-
+import contextAccountStore from './accountStore';
+import { observer } from 'mobx-react';
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
 function RootLayout({ children }: RootLayoutProps) {
-  const [avatarURL, setAvatarURL] = React.useState('');
-  const [account, setAccount] = React.useState(null);
+  const accountStore = React.useContext(contextAccountStore);
+  const { account, avatarURL } = accountStore;
   const [items, setItems] = React.useState([{ label: 'Home', key: 'home' }]);
   const router = useRouter();
   useEffect(() => {
     const storedAccount = localStorage.getItem('account');
     const accountTemp = storedAccount ? JSON.parse(storedAccount) : null;
-    setAccount(accountTemp);
+    accountStore.setAccount(accountTemp);
     if (accountTemp) {
       getAvatarURL(accountTemp).then((url) => {
-        setAvatarURL(url);
+        accountStore.setAvatarURL(url);
       });
       if (accountTemp.role.includes('admin'))
-        setItems((prevItems) => [
-          ...prevItems,
+        setItems([
+          { label: 'Home', key: 'home' },
           { label: 'Admin', key: 'admin' },
         ]);
     }
@@ -105,4 +106,4 @@ function RootLayout({ children }: RootLayoutProps) {
   );
 }
 
-export default RootLayout;
+export default observer(RootLayout);

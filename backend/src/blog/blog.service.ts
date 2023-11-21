@@ -5,6 +5,7 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { PaginationBlogDto } from './dto/pagination-blog.dto';
 import { Blog } from './entities/blog.entity';
 import { UserService } from '../user/user.service';
+import { FindAllBlogDto } from './dto/findAll-blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -18,12 +19,37 @@ export class BlogService {
     await this.em.persistAndFlush(blog);
   }
 
-  findAll() {
-    return `This action returns all blog`;
+  async findAll(findAllBlogDto: FindAllBlogDto) {
+    const qb = this.em.createQueryBuilder(Blog, 'blog');
+    qb.orderBy({
+      [findAllBlogDto.sortField || 'createdAt']:
+        findAllBlogDto.sortOrder === 'ascend' ? 'ASC' : 'DESC',
+    });
+    qb.offset((findAllBlogDto.current - 1) * findAllBlogDto.pageSize);
+    qb.limit(findAllBlogDto.pageSize);
+    qb.where({ deletedAt: null });
+    if (findAllBlogDto.filters) {
+      Object.entries(findAllBlogDto.filters).forEach(([key, value]) => {
+        qb.andWhere({ [key]: { $like: value } });
+      });
+    }
+    let items = await qb.getResult();
+    items = await Promise.all(
+      items.map(async (item) => {
+        const sanitizedAuthor = await this.userService.getAuthor(
+          item.author.account.id,
+        );
+        return {
+          ...item,
+          author: sanitizedAuthor,
+        };
+      }),
+    );
+    return items;
   }
 
   async findOne(id: number) {
-    const blog: Blog = await this.em.findOne('Blog', id);
+    const blog: Blog = await this.em.findOne('Blog', { id, deletedAt: null });
     if (blog) {
       const sanitizedAuthor = await this.userService.getAuthor(
         blog.author.account.id,
@@ -44,12 +70,16 @@ export class BlogService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} blog`;
+  async remove(id: number) {
+    const blog: Blog = await this.em.getReference('Blog', id);
+    blog.deletedAt = new Date();
+    await this.em.persistAndFlush(blog);
   }
 
   async pagination(paginationBlogDto: PaginationBlogDto) {
     const qb = this.em.createQueryBuilder(Blog, 'blog');
+    qb.where({ deletedAt: null });
+    qb.orderBy({ createdAt: 'DESC' });
     qb.offset((paginationBlogDto.current - 1) * paginationBlogDto.pageSize);
     qb.limit(paginationBlogDto.pageSize);
     let items = await qb.getResult();

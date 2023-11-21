@@ -6,7 +6,7 @@ import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 
 @Module({
-  controllers: [BlogController, CommentController],
+  controllers: [CommentController, BlogController],
   imports: [UserModule],
   providers: [BlogService, CommentService],
 })

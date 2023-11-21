@@ -1,0 +1,16 @@
+.replySpan {
+  line-height: 1.5715;
+  font-feature-settings: 'tnum', "tnum";
+  list-style: none;
+  outline: none;
+  margin-right: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.replySpan:hover{
+  transition: color 0.3s;
+  color: rgba(0, 0, 0, 0.8);
+}

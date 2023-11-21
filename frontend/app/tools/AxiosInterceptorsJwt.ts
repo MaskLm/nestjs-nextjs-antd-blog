@@ -10,7 +10,7 @@ axiosInstance.interceptors.request.use(async (config) => {
   const refreshToken = localStorage.getItem('refreshToken');
 
   if (accessToken && refreshToken) {
-    const isTokenExpired = checkIfTokenExpired(accessToken);
+    const isTokenExpired = await checkIfTokenExpired(accessToken);
 
     if (isTokenExpired) {
       try {
@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(async (config) => {
         localStorage.setItem('accessToken', ans.accessToken);
         config.headers.Authorization = `Bearer ${newAccessToken}`;
       } catch (error) {
-        message.error('Failed to refresh access token:' + error);
+        message.error('Failed to refresh access token');
         throw error;
       }
     } else {

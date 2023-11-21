@@ -1,3 +1,4 @@
+'use client';
 import dynamic from 'next/dynamic';
 import React from 'react';
 
@@ -9,14 +10,14 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-function Layout({ children }: RootLayoutProps) {
+const Layout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body>
-        <RootLayout>{children}</RootLayout>;
+        <RootLayout>{children}</RootLayout>
       </body>
     </html>
   );
-}
+};
 
 export default Layout;

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 const AdminPage = () => {
   const router = useRouter();
   useEffect(() => {
-    if (!checkAdmin()) router.push('/');
+    if (!checkAdmin()) router.push('/result/deny');
   }, []);
 
   return (

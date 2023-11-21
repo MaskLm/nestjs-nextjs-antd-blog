@@ -23,18 +23,35 @@ export class CommentService {
   ): Promise<CommentItem[]> {
     const qb = this.em.createQueryBuilder(Comment, 'comment');
     qb.where({ topic: topicId });
+    qb.andWhere({ deletedAt: null });
     qb.orderBy({ createdAt: 'ASC' });
     const comments: Comment[] = await qb.getResult();
-    const commentItems: CommentItem[] = comments.map((comment: Comment) => {
-      return {
-        from_user_Id: comment.from_user.account.id,
-        from_user_nickname: comment.from_user.nickname,
-        from_user_avatar: comment.from_user.avatarURL,
-        to_user_nickname: comment.to_user?.nickname || null,
-        to_user_Id: comment.to_user?.account.id || null,
-        datetime: comment.createdAt,
-      };
-    });
+    const commentItems: CommentItem[] = await Promise.all(
+      comments.map(async (comment: Comment): Promise<CommentItem> => {
+        const from_user = await this.userService.getAuthor(
+          comment.from_user.account.id,
+        );
+        const to_user = await this.userService.getAuthor(
+          comment.to_user?.account.id,
+        );
+        return {
+          id: comment.id,
+          from_user_Id: from_user.account.id,
+          from_user_nickname: from_user.nickname,
+          from_user_avatar: from_user.avatarURL,
+          to_user_nickname: to_user?.nickname || null,
+          to_user_Id: to_user?.account.id || null,
+          datetime: comment.createdAt,
+          content: comment.content,
+        } as CommentItem;
+      }),
+    );
     return commentItems;
+  }
+
+  async delete(id: number) {
+    const comment = await this.em.findOne(Comment, id);
+    comment.deletedAt = new Date();
+    await this.em.persistAndFlush(comment);
   }
 }

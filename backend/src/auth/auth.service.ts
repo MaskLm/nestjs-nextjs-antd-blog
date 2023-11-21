@@ -69,7 +69,24 @@ export class AuthService {
     });
   }
 
-  //async oauth2Login(oauth2LoginDto: Oauth2LoginDto) {}
+  async oauth2Login(oauth2LoginDto: Oauth2LoginDto) {
+    //   `oauth2:${accountId}:${type}:${openId}`,
+    const parts = (await this.redis.get(oauth2LoginDto.token)).split(':');
+    const account = await this.accountService.findOne(+parts[1]);
+    if (!account) throw new UnauthorizedException();
+    const payload = {
+      username: account.username,
+      sub: account.id,
+      role: account.role,
+    };
+    const refreshToken = this.generateRefreshToken(account);
+    const accessToken = this.generateAccessToken(account);
+    return {
+      account: payload,
+      accessToken,
+      refreshToken,
+    };
+  }
 
   async login(loginAuthDto: LoginAuthDto) {
     const account = await this.accountService.findByUsername(

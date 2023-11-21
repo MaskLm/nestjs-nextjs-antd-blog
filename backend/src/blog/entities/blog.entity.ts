@@ -16,10 +16,14 @@ export class Blog {
   content: string;
   @Property()
   title: string;
+  @Property({ nullable: true })
+  description: string;
   @Property()
   createdAt: Date = new Date();
   @Property({ onUpdate: () => new Date() })
   updatedAt: Date = new Date();
+  @Property({ nullable: true })
+  deletedAt: Date;
   @ManyToOne(() => User)
   author: User;
   @OneToMany(() => Comment_Blog, (comment) => comment.topic)

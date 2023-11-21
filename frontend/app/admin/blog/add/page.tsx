@@ -2,15 +2,20 @@
 
 import 'client-only';
 
-import SimpleMDE from 'react-simplemde-editor';
-import 'easymde/dist/easymde.min.css';
-import { Button, Form, Input, message } from 'antd';
-import React from 'react';
+import { message } from 'antd';
+import React, { useEffect } from 'react';
 import AxiosInterceptorsJwt from '../../../tools/AxiosInterceptorsJwt';
 import { isAxiosError } from 'axios';
-import { useRouter } from 'next/router';
+import checkAdmin from '../../../tools/CheckAdmin';
+import { useRouter } from 'next/navigation';
+import BlogForm from '../blogForm';
 
 const BlogAddContainer = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!checkAdmin()) router.push('/result/deny');
+  }, []);
   async function onFinish(values: any) {
     try {
       const storedAccount = localStorage.getItem('account');
@@ -20,7 +25,7 @@ const BlogAddContainer = () => {
           ...values,
           author: account.sub,
         };
-        const req = AxiosInterceptorsJwt.post(
+        AxiosInterceptorsJwt.post(
           process.env.NEXT_PUBLIC_API_URL + '/blog',
           params,
         );
@@ -37,24 +42,7 @@ const BlogAddContainer = () => {
     }
   }
 
-  return (
-    <Form name="blogAdd" onFinish={onFinish}>
-      <Form.Item label="Title" name={'title'} required>
-        <Input />
-      </Form.Item>
-      <Form.Item label="Content" name={'content'}>
-        <SimpleMDE />
-      </Form.Item>
-      <Form.Item label={'Description'} name={'description'}>
-        <Input.TextArea />
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
-  );
+  return <BlogForm onFinish={onFinish} />;
 };
 
 export default BlogAddContainer;

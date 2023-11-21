@@ -3,6 +3,7 @@ import { message, Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
 import Comments from './comments';
+import './comments.css';
 
 const BlogContainer = ({ params }: { params: { slug: number } }) => {
   const [data, setData] = useState({
