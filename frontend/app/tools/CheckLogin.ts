@@ -1,12 +1,13 @@
+'use client';
 import { checkIfTokenExpired } from './jwtTools';
 
-const getAccountId = async () => {
+const checkLogin = async () => {
   const storedAccount = localStorage.getItem('account');
   const accountTemp = storedAccount ? JSON.parse(storedAccount) : null;
   const refreshToken = localStorage.getItem('refreshToken');
   if (refreshToken) {
-    if (accountTemp && (await checkIfTokenExpired(refreshToken))) {
-      return accountTemp.sub;
+    if (accountTemp && !(await checkIfTokenExpired(refreshToken))) {
+      return true;
     }
   }
   localStorage.removeItem('accessToken');
@@ -15,4 +16,4 @@ const getAccountId = async () => {
   return false;
 };
 
-export default getAccountId;
+export default checkLogin;

@@ -37,28 +37,31 @@ export class Oauth2Controller {
     if (code) {
       const ans = await this.oauth2Service.googleCallback(code);
       return res.redirect(
-        process.env.FRONTEND_URL + '/oauth2/google/callback?token=' + ans,
+        process.env.FRONTEND_URL + '/oauth2/callback?token=' + ans,
       );
     }
   }
 
-  @Post()
-  create(@Body() createOauth2Dto: CreateOauth2Dto) {
-    return this.oauth2Service.create(createOauth2Dto);
+  @Public()
+  @Get('github/callback')
+  async githubCallback(
+    @Res() res: Response,
+    @Query('error') error?: string,
+    @Query('code') code?: string,
+    @Query('state') state?: string,
+  ) {
+    if (error) throw new UnauthorizedException(error);
+    if (code) {
+      const ans = await this.oauth2Service.githubCallback(code, state);
+      return res.redirect(
+        process.env.FRONTEND_URL + '/oauth2/callback?token=' + ans,
+      );
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.oauth2Service.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.oauth2Service.findOne(+id);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.oauth2Service.remove(+id);
+  @Public()
+  @Get('state')
+  async setState(@Query('state') state: string) {
+    return await this.oauth2Service.setState(state);
   }
 }

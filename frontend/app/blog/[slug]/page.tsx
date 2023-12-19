@@ -2,6 +2,7 @@
 import { message, Spin } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import rehypeRaw from 'rehype-raw';
 import Comments from './comments';
 import './comments.css';
 
@@ -45,6 +46,9 @@ const BlogContainer = ({ params }: { params: { slug: number } }) => {
               <h4>{data.author.nickname}</h4>
               <br />
               <ReactMarkdown
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-expect-error
+                rehypePlugins={[rehypeRaw]}
                 components={{
                   img(props) {
                     return <img {...props} style={{ maxWidth: '100%' }} />;

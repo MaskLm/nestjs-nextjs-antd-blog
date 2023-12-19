@@ -4,9 +4,19 @@ import React, { useContext, useEffect } from 'react';
 import { LoginFunc } from './api/login';
 import { useRouter } from 'next/navigation';
 import contextAccountStore from '../accountStore';
+import axios from 'axios';
+import getAvatarURL from '../tools/account/getAvatar';
+import checkLogin from '../tools/CheckLogin';
+import Link from 'next/link';
 
 const LoginContainer = () => {
   const router = useRouter();
+  useEffect(() => {
+    const loginCheck = async () => {
+      if (await checkLogin()) router.push('/');
+    };
+    loginCheck();
+  }, []);
   const accountStore = useContext(contextAccountStore);
   useEffect(() => {
     const script = document.createElement('script');
@@ -24,6 +34,7 @@ const LoginContainer = () => {
     try {
       const account = await LoginFunc(values);
       accountStore.setAccount(account);
+      accountStore.setAvatarURL(await getAvatarURL(account));
       message.success('Login Success');
       setTimeout(() => {
         router.push('/');
@@ -67,6 +78,7 @@ const LoginContainer = () => {
           rules={[{ required: true, message: 'Please input your password!' }]}
         >
           <Input.Password />
+          <Link href={'/account/forgotPassword'}>Forgot Password</Link>
         </Form.Item>
 
         <Form.Item
@@ -83,8 +95,8 @@ const LoginContainer = () => {
           </Button>
         </Form.Item>
       </Form>
-      <Row>
-        <Col span={8} offset={8}>
+      <Row gutter={[0, 16]}>
+        {/* <Col span={8} offset={8}>
           <div>
             <div
               id="g_id_onload"
@@ -104,8 +116,33 @@ const LoginContainer = () => {
               data-logo_alignment="left"
             ></div>
           </div>
+        </Col> */}
+        <Col span={8} offset={8}>
+          <Link href={'/reg'}>
+            <Button>Register</Button>
+          </Link>
         </Col>
-        <Col></Col>
+        <Col span={8} offset={8}>
+          <Button
+            onClick={async () => {
+              const state = Math.random().toString(36).substring(7);
+              await axios.get(
+                process.env.NEXT_PUBLIC_API_URL + '/oauth2/state',
+                { params: { state: state } },
+              );
+              const query = new URLSearchParams({
+                client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '',
+                scope: 'read:user user:email',
+                state: state,
+              });
+              router.push(
+                `https://github.com/login/oauth/authorize?${query.toString()}`,
+              );
+            }}
+          >
+            Login With Github
+          </Button>
+        </Col>
       </Row>
     </>
   );

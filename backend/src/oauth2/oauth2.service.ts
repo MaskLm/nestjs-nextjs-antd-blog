@@ -1,4 +1,5 @@
 import {
+  HttpException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -11,6 +12,8 @@ import { AccountService } from 'src/account/account.service';
 import { UserService } from 'src/user/user.service';
 import { Oauth2 } from './entities/oauth2.entity';
 import Redis from 'ioredis';
+import axios from 'axios';
+import { Octokit } from 'octokit';
 
 @Injectable()
 export class Oauth2Service {
@@ -38,6 +41,57 @@ export class Oauth2Service {
       scope: scopes,
       include_granted_scopes: true,
     });
+  }
+
+  async githubCallback(code: string, state: string) {
+    const stateExist = await this.redis.get(state);
+    if (!stateExist) throw new UnauthorizedException('state not exist');
+    try {
+      console.log(code);
+      const res = await axios.post(
+        'https://github.com/login/oauth/access_token',
+        {
+          client_id: process.env.GITHUB_CLIENT_ID,
+          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          code: code,
+        },
+        {
+          headers: {
+            Accept: 'application/json',
+          },
+        },
+      );
+      const access_token = res.data.access_token;
+      console.log(access_token);
+      const octokit = new Octokit({ auth: access_token });
+      const userInfo = await octokit.request('GET /user');
+      console.log(userInfo);
+      const email: string =
+        userInfo.data.email ||
+        (
+          await octokit.request('GET /user/emails', {
+            headers: {
+              'X-GitHub-Api-Version': '2022-11-28',
+            },
+          })
+        ).data.find((email) => email.primary === true).email;
+      console.log(email);
+      const ans = await this.handleOauth2Data(
+        userInfo.data.avatar_url,
+        email,
+        userInfo.data.id.toString(),
+        {
+          refresh_token: access_token,
+          access_token: access_token,
+        },
+        'github',
+      );
+      return ans;
+    } catch (e) {
+      throw new HttpException('Some Error', 400, {
+        cause: new Error(e),
+      });
+    }
   }
   async googleCallback(code: string): Promise<string> {
     try {
@@ -84,12 +138,26 @@ export class Oauth2Service {
   ) {
     try {
       const oauth2: Oauth2 = await this.em.findOne('Oauth2', { openId, type });
+      console.log('233');
+      const account = await this.accountService.findByEmailWithoutError(email);
+      console.log('run before findByEmail');
       let accountId = -1;
       if (oauth2) {
         oauth2.accessToken = tokens.access_token;
         oauth2.refreshToken = tokens.refresh_token;
         accountId = oauth2.account.id;
         await this.em.persistAndFlush(oauth2);
+      } else if (!oauth2 && account) {
+        console.log(tokens);
+        await this.create({
+          openId,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          type: type,
+          account: account.id,
+        });
+        accountId = account.id;
+        console.log('222');
       } else {
         const account = await this.accountService.create({
           username: openId,
@@ -105,7 +173,7 @@ export class Oauth2Service {
           accessToken: tokens.access_token,
           refreshToken: tokens.refresh_token,
           type: type,
-          accountId: account.id,
+          account: account.id,
         });
       }
       return await this.generateToken(openId, type, accountId);
@@ -126,8 +194,12 @@ export class Oauth2Service {
   }
 
   async create(createOauth2Dto: CreateOauth2Dto) {
-    const oauth2 = this.em.create('Oauth2', createOauth2Dto);
-    await this.em.persistAndFlush(oauth2);
+    try {
+      const oauth2 = this.em.create('Oauth2', createOauth2Dto);
+      await this.em.persistAndFlush(oauth2);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   findAll(): string {
@@ -157,5 +229,9 @@ export class Oauth2Service {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+  }
+
+  async setState(state: string) {
+    await this.redis.set(state, `true`, 'EX', 360);
   }
 }

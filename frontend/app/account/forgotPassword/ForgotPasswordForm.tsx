@@ -158,17 +158,8 @@ const ForgotPasswordForm = () => {
       >
         <Input.Password />
       </Form.Item>
-      <Form.Item
-        wrapperCol={{
-          xs: { span: 24 },
-          sm: { offset: 8, span: 16 },
-          md: { offset: 8, span: 12 },
-          lg: { offset: 8, span: 12 },
-          xl: { offset: 8, span: 12 },
-          xxl: { offset: 8, span: 10 },
-        }}
-      >
-        <Button type="primary" htmlType="submit" style={{ width: '80%' }}>
+      <Form.Item wrapperCol={{ offset: 8, span: 8 }}>
+        <Button type="primary" htmlType="submit">
           Submit
         </Button>
       </Form.Item>

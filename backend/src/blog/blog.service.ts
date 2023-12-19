@@ -30,7 +30,7 @@ export class BlogService {
     qb.where({ deletedAt: null });
     if (findAllBlogDto.filters) {
       Object.entries(findAllBlogDto.filters).forEach(([key, value]) => {
-        qb.andWhere({ [key]: { $like: value } });
+        qb.andWhere({ [key]: { $like: `%${value}%` } });
       });
     }
     let items = await qb.getResult();
@@ -79,6 +79,8 @@ export class BlogService {
   async pagination(paginationBlogDto: PaginationBlogDto) {
     const qb = this.em.createQueryBuilder(Blog, 'blog');
     qb.where({ deletedAt: null });
+    if (paginationBlogDto.filters?.title)
+      qb.andWhere({ title: { $like: `%${paginationBlogDto.filters.title}%` } });
     qb.orderBy({ createdAt: 'DESC' });
     qb.offset((paginationBlogDto.current - 1) * paginationBlogDto.pageSize);
     qb.limit(paginationBlogDto.pageSize);

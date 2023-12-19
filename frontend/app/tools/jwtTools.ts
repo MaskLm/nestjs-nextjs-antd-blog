@@ -2,11 +2,10 @@
 import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { message } from 'antd';
 
-export async function checkIfTokenExpired(accessToken: string) {
+export async function checkIfTokenExpired(token: string) {
   try {
-    const decoded = await jwtDecode(accessToken);
+    const decoded = await jwtDecode(token);
     const currentTime = Date.now() / 1000;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -39,7 +38,6 @@ export async function refreshAccessToken(refreshToken: string) {
     );
     return response.data;
   } catch (error) {
-    message.error('Failed to refresh access token:' + error);
     throw error;
   }
 }

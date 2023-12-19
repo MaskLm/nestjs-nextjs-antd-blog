@@ -14,7 +14,7 @@ export class Oauth2 {
   id: number;
   @Property()
   accessToken: string;
-  @Property()
+  @Property({ nullable: true })
   refreshToken: string;
   @Property()
   type: string;
@@ -24,6 +24,6 @@ export class Oauth2 {
   account: Account;
   @Property()
   createdAt = new Date();
-  @Property()
+  @Property({ nullable: true })
   deletedAt?: Date;
 }

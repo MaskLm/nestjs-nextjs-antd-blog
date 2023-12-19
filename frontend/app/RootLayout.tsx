@@ -27,13 +27,24 @@ function RootLayout({ children }: RootLayoutProps) {
       getAvatarURL(accountTemp).then((url) => {
         accountStore.setAvatarURL(url);
       });
-      if (accountTemp.role.includes('admin'))
+      if (account?.role.includes('admin'))
         setItems([
           { label: 'Home', key: 'home' },
           { label: 'Admin', key: 'admin' },
         ]);
+    } else {
+      accountStore.setAccount(null);
+      accountStore.setAvatarURL('');
     }
   }, []);
+
+  useEffect(() => {
+    if (account?.role.includes('admin'))
+      setItems([
+        { label: 'Home', key: 'home' },
+        { label: 'Admin', key: 'admin' },
+      ]);
+  }, [account]);
 
   function onClick({ item, key, keyPath, domEvent }: any) {
     switch (key) {
@@ -94,10 +105,8 @@ function RootLayout({ children }: RootLayoutProps) {
           </Col>
         </Row>
       </Header>
-      <Content style={{ padding: '0 50px' }}>
-        <div className="site-layout-content" style={{ marginTop: '50px' }}>
-          {children}
-        </div>
+      <Content className="site-content">
+        <div className="site-layout-content">{children}</div>
       </Content>
       <Footer style={{ textAlign: 'center' }}>
         Ant Design ©2018 Created by Ant UED

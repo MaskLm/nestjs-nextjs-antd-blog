@@ -1,7 +1,6 @@
 'use client';
 import axios from 'axios';
 import { checkIfTokenExpired, refreshAccessToken } from './jwtTools';
-import { message } from 'antd';
 
 const axiosInstance = axios.create();
 
@@ -19,7 +18,6 @@ axiosInstance.interceptors.request.use(async (config) => {
         localStorage.setItem('accessToken', ans.accessToken);
         config.headers.Authorization = `Bearer ${newAccessToken}`;
       } catch (error) {
-        message.error('Failed to refresh access token');
         throw error;
       }
     } else {

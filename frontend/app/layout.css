@@ -1,22 +1,59 @@
 .site-layout-content {
-    min-height: 280px;
-    padding: 24px;
-    background: #fff;
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+}
+
+/* Mobile devices */
+@media (max-width: 600px) {
+  .site-layout-content {
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .site-content {
+    padding: 0 10px;
+  }
+}
+
+/* Tablet devices */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .site-layout-content {
+    padding: 30px;
+    margin-top: 20px;
+  }
+  .site-content {
+    padding: 0 20px;
+  }
+}
+
+/* Desktop devices */
+@media (min-width: 1025px) {
+  .site-layout-content {
+    padding: 50px;
+    margin-top: 20px;
+  }
+  .site-content {
+    padding: 0 40px;
+  }
+}
+
+.layout {
+  min-height: 100vh;
 }
 
 .logo {
-    float: left;
-    width: 120px;
-    height: 31px;
-    margin: 16px 24px 16px 0;
-    background: rgba(255, 255, 255, 0.3);
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .ant-row-rtl .logo {
-    float: right;
-    margin: 16px 0 16px 24px;
+  float: right;
+  margin: 16px 0 16px 24px;
 }
 
-[data-theme="dark"] .site-layout-content {
-    background: #141414;
+[data-theme='dark'] .site-layout-content {
+  background: #141414;
 }

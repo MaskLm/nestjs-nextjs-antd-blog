@@ -1,21 +1,20 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { MailService } from './mail.service';
-import { CreateMailDto } from './dto/create-mail.dto';
 import { Public } from '../auth/decorator/public-decorator';
 
 @Controller('mail')
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 
-  @Post()
-  create(@Body() createMailDto: CreateMailDto) {
-    return this.mailService.create(createMailDto);
-  }
+  // @Post()
+  // create(@Body() createMailDto: CreateMailDto) {
+  //   return this.mailService.create(createMailDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.mailService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.mailService.findAll();
+  // }
 
   @Public()
   @Get('sendResetPassword')

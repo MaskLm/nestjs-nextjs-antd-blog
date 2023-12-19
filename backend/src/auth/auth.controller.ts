@@ -16,6 +16,7 @@ import { LocalAuthGuard } from './guard/local-auth-guard';
 import { Public } from './decorator/public-decorator';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Oauth2LoginDto } from './dto/oauth2-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,12 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return await this.authService.refresh(refreshTokenDto);
+  }
+
+  @Public()
+  @Post('oauth2/login')
+  async oauth2Login(@Body() oauth2LoginDto: Oauth2LoginDto) {
+    return await this.authService.oauth2Login(oauth2LoginDto);
   }
 
   @Public()
@@ -53,10 +60,9 @@ export class AuthController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  async update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
+    return await this.authService.update(+id, updateAuthDto);
   }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authService.remove(+id);

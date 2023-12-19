@@ -3,14 +3,15 @@ import { Form, Input } from 'antd';
 import PasswordValidation from '../../tools/account/PasswordValidation';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import getAccountId from '../../tools/GetAccountId';
+import checkLogin from '../../tools/CheckLogin';
 
 const ChangePasswordForm = () => {
-  let accountId = -1;
   const router = useRouter();
   useEffect(() => {
-    accountId = getAccountId();
-    if (accountId == -1) router.push('/login');
+    const loginCheck = async () => {
+      if (!(await checkLogin())) router.push('/login');
+    };
+    loginCheck();
   }, []);
 
   /*  function getChangeAccountToken() {}

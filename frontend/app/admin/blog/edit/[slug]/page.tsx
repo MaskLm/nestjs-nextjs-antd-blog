@@ -22,7 +22,6 @@ const BlogEditContainer = ({ params }: { params: { slug: number } }) => {
       const ans = await axiosInstance.get(
         process.env.NEXT_PUBLIC_API_URL + '/blog/' + params.slug,
       );
-      console.log(ans.data);
       setValue(ans.data);
       setLoading(false);
     } catch (e) {

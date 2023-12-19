@@ -3,13 +3,15 @@
 import { AutoComplete, Button, Col, Form, Input, message, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RegFunc } from './api/reg';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import PasswordValidation from '../tools/account/PasswordValidation';
+import axios from 'axios';
 
 const RegContainer = () => {
   const [emailOption, setEmailOption] = useState<
     { value: string; label: string }[]
   >([]);
+  const router = useRouter();
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -30,8 +32,7 @@ const RegContainer = () => {
       message.success('Registration successful!');
       useEffect(() => {
         const clear = async () => {
-          const router = useRouter();
-          await router.push('/login');
+          router.push('/login');
         };
         clear();
       }, []);
@@ -151,7 +152,7 @@ const RegContainer = () => {
       </Form>
       <Row>
         <Col span={8} offset={8}>
-          <div>
+          {/* <div>
             <div
               id="g_id_onload"
               data-client_id=""
@@ -170,7 +171,26 @@ const RegContainer = () => {
               data-logo_alignment="center"
               data-width="100"
             ></div>
-          </div>
+          </div> */}
+          <Button
+            onClick={async () => {
+              const state = Math.random().toString(36).substring(7);
+              await axios.get(
+                process.env.NEXT_PUBLIC_API_URL + '/oauth2/state',
+                { params: { state: state } },
+              );
+              const query = new URLSearchParams({
+                client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '',
+                scope: 'read:user user:email',
+                state: state,
+              });
+              router.push(
+                `https://github.com/login/oauth/authorize?${query.toString()}`,
+              );
+            }}
+          >
+            Login With Github
+          </Button>
         </Col>
       </Row>
     </>

@@ -10,6 +10,11 @@ import * as fs from 'fs';
 export class UserService {
   constructor(private readonly em: EntityManager) {}
 
+  async getNickname(id: number) {
+    const user: User = await this.em.findOne('User', { account: id });
+    return user.nickname;
+  }
+
   async create(createUserDto: CreateUserDto) {
     const user: User = this.em.create('User', createUserDto);
     await this.em.persistAndFlush(user);

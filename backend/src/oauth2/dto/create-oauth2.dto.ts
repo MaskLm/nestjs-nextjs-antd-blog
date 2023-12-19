@@ -1,14 +1,14 @@
-import { IsJWT, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateOauth2Dto {
-  @IsJWT()
+  @IsString()
   accessToken: string;
-  @IsJWT()
+  @IsString()
   refreshToken: string;
   @IsString()
   type: string;
   @IsString()
   openId: string;
   @IsNumber()
-  accountId: number;
+  account: number;
 }
