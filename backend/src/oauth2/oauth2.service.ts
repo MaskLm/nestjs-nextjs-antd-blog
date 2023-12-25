@@ -47,7 +47,6 @@ export class Oauth2Service {
     const stateExist = await this.redis.get(state);
     if (!stateExist) throw new UnauthorizedException('state not exist');
     try {
-      console.log(code);
       const res = await axios.post(
         'https://github.com/login/oauth/access_token',
         {
@@ -62,10 +61,8 @@ export class Oauth2Service {
         },
       );
       const access_token = res.data.access_token;
-      console.log(access_token);
       const octokit = new Octokit({ auth: access_token });
       const userInfo = await octokit.request('GET /user');
-      console.log(userInfo);
       const email: string =
         userInfo.data.email ||
         (
@@ -75,7 +72,6 @@ export class Oauth2Service {
             },
           })
         ).data.find((email) => email.primary === true).email;
-      console.log(email);
       const ans = await this.handleOauth2Data(
         userInfo.data.avatar_url,
         email,
@@ -138,9 +134,7 @@ export class Oauth2Service {
   ) {
     try {
       const oauth2: Oauth2 = await this.em.findOne('Oauth2', { openId, type });
-      console.log('233');
       const account = await this.accountService.findByEmailWithoutError(email);
-      console.log('run before findByEmail');
       let accountId = -1;
       if (oauth2) {
         oauth2.accessToken = tokens.access_token;
@@ -148,7 +142,6 @@ export class Oauth2Service {
         accountId = oauth2.account.id;
         await this.em.persistAndFlush(oauth2);
       } else if (!oauth2 && account) {
-        console.log(tokens);
         await this.create({
           openId,
           accessToken: tokens.access_token,
@@ -157,7 +150,6 @@ export class Oauth2Service {
           account: account.id,
         });
         accountId = account.id;
-        console.log('222');
       } else {
         const account = await this.accountService.create({
           username: openId,
