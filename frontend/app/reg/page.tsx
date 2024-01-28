@@ -13,29 +13,24 @@ const RegContainer = () => {
   >([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+  // useEffect(() => {
+  //   const script = document.createElement('script');
+  //   script.src = 'https://accounts.google.com/gsi/client';
+  //   script.async = true;
+  //   script.defer = true;
+  //   document.body.appendChild(script);
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  //   return () => {
+  //     document.body.removeChild(script);
+  //   };
+  // }, []);
 
   async function onFinish(values: any) {
     const { confirm, ...rest } = values;
     try {
       await RegFunc(rest);
       message.success('Registration successful!');
-      useEffect(() => {
-        const clear = async () => {
-          router.push('/login');
-        };
-        clear();
-      }, []);
+      router.push('/login');
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

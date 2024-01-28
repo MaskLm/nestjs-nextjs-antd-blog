@@ -138,7 +138,6 @@ export class Oauth2Service {
   ) {
     try {
       const oauth2: Oauth2 = await this.em.findOne('Oauth2', { openId, type });
-      console.log('233');
       const account = await this.accountService.findByEmailWithoutError(email);
       console.log('run before findByEmail');
       let accountId = -1;
@@ -157,7 +156,6 @@ export class Oauth2Service {
           account: account.id,
         });
         accountId = account.id;
-        console.log('222');
       } else {
         const account = await this.accountService.create({
           username: openId,

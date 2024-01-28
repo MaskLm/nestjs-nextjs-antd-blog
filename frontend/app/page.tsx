@@ -1,8 +1,4 @@
-import dynamic from 'next/dynamic';
-
-const BlogList = dynamic(() => import('./BlogList'), {
-  ssr: false,
-});
+import BlogList from './BlogList';
 
 const HomePage = () => {
   return <BlogList />;

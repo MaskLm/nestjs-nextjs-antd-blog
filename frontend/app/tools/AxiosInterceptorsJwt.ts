@@ -1,6 +1,6 @@
 'use client';
 import axios from 'axios';
-import { checkIfTokenExpired, refreshAccessToken } from './jwtTools';
+import { checkJWTIsNoExpired, refreshAccessToken } from './jwtTools';
 
 const axiosInstance = axios.create();
 
@@ -9,7 +9,7 @@ axiosInstance.interceptors.request.use(async (config) => {
   const refreshToken = localStorage.getItem('refreshToken');
 
   if (accessToken && refreshToken) {
-    const isTokenExpired = await checkIfTokenExpired(accessToken);
+    const isTokenExpired = !(await checkJWTIsNoExpired(accessToken));
 
     if (isTokenExpired) {
       try {
