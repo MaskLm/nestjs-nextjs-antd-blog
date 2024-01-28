@@ -63,6 +63,7 @@ const BlogList = () => {
 
   useEffect(() => {
     fetchData();
+    console.log(process.env.NEXT_PUBLIC_WEB_URL);
   }, [JSON.stringify(listParams)]);
 
   return (
@@ -92,13 +93,7 @@ const BlogList = () => {
           <List.Item key={item.title}>
             <List.Item.Meta
               avatar={<Avatar src={item.author.avatarURL} />}
-              title={
-                <Link
-                  href={process.env.NEXT_PUBLIC_WEB_URL + '/blog/' + item.id}
-                >
-                  {item.title}
-                </Link>
-              }
+              title={<Link href={'/blog/' + item.id}>{item.title}</Link>}
               description={item.description}
             />
             {item.content}
