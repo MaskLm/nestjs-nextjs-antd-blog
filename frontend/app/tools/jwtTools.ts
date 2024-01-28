@@ -3,14 +3,13 @@ import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
-export async function checkIfTokenExpired(token: string) {
+export async function checkJWTIsNoExpired(token: string): Promise<boolean> {
   try {
     const decoded = await jwtDecode(token);
     const currentTime = Date.now() / 1000;
-
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    return decoded.exp && decoded.exp < currentTime;
+    return decoded.exp && decoded.exp > currentTime;
   } catch (error) {
     console.error('Failed to decode access token:', error);
     return false;

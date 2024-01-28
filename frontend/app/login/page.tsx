@@ -76,11 +76,10 @@ const LoginContainer = () => {
           label="Password"
           name="password"
           rules={[{ required: true, message: 'Please input your password!' }]}
+          extra={<Link href={'/account/forgotPassword'}>Forgot Password</Link>}
         >
           <Input.Password />
-          <Link href={'/account/forgotPassword'}>Forgot Password</Link>
         </Form.Item>
-
         <Form.Item
           name="remember"
           valuePropName="checked"
